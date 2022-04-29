@@ -1,4 +1,5 @@
 import generateFood from "./generateFood";
+import generateInitSnake from "./generateInitSnake";
 
 export default function generateInitBoard(size = 10) {
 	// check if size of the board is ok:
@@ -23,13 +24,7 @@ export default function generateInitBoard(size = 10) {
 		}
 	}
 	// create init snake:
-	const snake = {
-		head: { x: 2, y: 0 },
-		body: [
-			{ x: 0, y: 0 },
-			{ x: 1, y: 0 },
-		],
-	};
+	const snake = generateInitSnake();
 	// draw a snake into the board:
 	const head = snake.head;
 	board[head.y][head.x] = {
@@ -44,14 +39,13 @@ export default function generateInitBoard(size = 10) {
 		};
 	});
 	// draw a random piece of food into the board:
-	const eliminatedCoords = [
-		{ x: 0, y: 0 },
-		{ x: 1, y: 0 },
-		{ x: 2, y: 0 },
-	];
-	const food = generateFood(eliminatedCoords, size);
+	const food = generateFood(snake, size);
 	board[food.y][food.x].food = true;
 	// return init board
 	// with a snake in init position & random positioned piece of food:
-	return board;
+	return {
+		board: board,
+		snake: snake,
+		food: food,
+	};
 }

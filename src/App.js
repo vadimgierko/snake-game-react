@@ -1,23 +1,44 @@
-import logo from "./logo.svg";
 import "./App.css";
 import { useEffect, useState } from "react";
 import Screen from "./components/Screen";
 import generateInitBoard from "./logic/generateInitBoard";
-import game from "./logic/game";
+import runGame from "./logic/runGame";
 
 export default function App() {
 	const [board, setBoard] = useState();
+	const [snake, setSnake] = useState();
+	const [food, setFood] = useState();
 	const [dir, setDir] = useState("right"); // direction of the move ("left", "up", "down")
-	const [start, setStart] = useState(true); // is game running (bool)
+	const [start, setStart] = useState(false); // is game running (bool)
 
 	useEffect(() => {
 		if (!board || (board && !board.length)) {
-			const initBoard = generateInitBoard(10);
-			console.log("generated init board:", initBoard);
-			setBoard(initBoard);
+			const initState = generateInitBoard(10);
+			//console.log("generated init board:", initBoard);
+			setBoard(initState.board);
+			setSnake(initState.snake);
+			setFood(initState.food);
+		} else {
+			// const timer = setTimeout(() => {
+			// 	const updates = runGame(board, snake, food, dir);
+			// 	setBoard(updates.board);
+			// 	setSnake(updates.snake);
+			// 	setFood(updates.food);
+			// }, 1000);
+			// return () => clearTimeout(timer);
 		}
-		console.log("board:", board);
-	}, [board]);
+		//console.log("is game started? =>", start);
+	}, [board, snake, food, dir]);
+
+	// useEffect(() => {
+	// 	const timer = setTimeout(() => {
+	// 		const updates = runGame(board, snake, food, dir);
+	// 		setBoard(updates.board);
+	// 		setSnake(updates.snake);
+	// 		setFood(updates.food);
+	// 	}, 1000);
+	// 	return () => clearTimeout(timer);
+	// }, []);
 
 	return (
 		<div className="App">

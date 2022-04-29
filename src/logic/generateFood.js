@@ -1,6 +1,7 @@
 import generateRandomInt from "./generateRandomInt";
 
-export default function generateFood(eliminatedCoords = [], boardSize = 10) {
+export default function generateFood(snake, boardSize = 10) {
+	const eliminatedCoords = [snake.head, ...snake.body];
 	// generate random coords for food piece:
 	let coords = {
 		x: generateRandomInt(boardSize),
