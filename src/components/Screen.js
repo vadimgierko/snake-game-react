@@ -1,0 +1,32 @@
+export default function Screen({ board }) {
+	if (!board || (board && !board.length))
+		return (
+			<p className="game-screen">
+				There is no board generated... Wait a moment
+			</p>
+		);
+	return (
+		<table className="game-screen">
+			<tbody>
+				{board.map((row, r) => (
+					<tr key={"row-" + r}>
+						{row.map((cell, c) => (
+							<td
+								key={"col-" + c}
+								style={{
+									backgroundColor: cell.body
+										? "grey"
+										: cell.food
+										? "red"
+										: cell.head
+										? "green"
+										: "transparent",
+								}}
+							/>
+						))}
+					</tr>
+				))}
+			</tbody>
+		</table>
+	);
+}
