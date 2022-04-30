@@ -1,4 +1,5 @@
 export default function generateSnakeMove(prevSnake, dir) {
+	console.log("prevsnake", prevSnake);
 	// calculate move in given direction:
 	let move = {};
 	if (dir === "right") {
@@ -23,7 +24,7 @@ export default function generateSnakeMove(prevSnake, dir) {
 		};
 	}
 	// add move to the snake
-	const [first, ...remain] = [...prevSnake.body];
+	const [, ...remain] = prevSnake.body;
 	const updatedSnake = {
 		// move head:
 		head: {

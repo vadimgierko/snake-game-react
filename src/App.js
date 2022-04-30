@@ -18,27 +18,16 @@ export default function App() {
 			setBoard(initState.board);
 			setSnake(initState.snake);
 			setFood(initState.food);
-		} else {
-			// const timer = setTimeout(() => {
-			// 	const updates = runGame(board, snake, food, dir);
-			// 	setBoard(updates.board);
-			// 	setSnake(updates.snake);
-			// 	setFood(updates.food);
-			// }, 1000);
-			// return () => clearTimeout(timer);
 		}
-		//console.log("is game started? =>", start);
 	}, [board, snake, food, dir]);
 
-	// useEffect(() => {
-	// 	const timer = setTimeout(() => {
-	// 		const updates = runGame(board, snake, food, dir);
-	// 		setBoard(updates.board);
-	// 		setSnake(updates.snake);
-	// 		setFood(updates.food);
-	// 	}, 1000);
-	// 	return () => clearTimeout(timer);
-	// }, []);
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			const updatedBoard = runGame(board, dir);
+			setBoard(updatedBoard);
+		}, 1000);
+		return () => clearTimeout(timer);
+	}, [board, dir]);
 
 	return (
 		<div className="App">

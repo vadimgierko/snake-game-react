@@ -1,28 +1,10 @@
+import generateEmptyBoard from "./generateEmptyBoard";
 import generateFood from "./generateFood";
 import generateInitSnake from "./generateInitSnake";
 
 export default function generateInitBoard(size = 10) {
-	// check if size of the board is ok:
-	if (size < 10) {
-		alert(
-			"The board of size: " +
-				size +
-				" will be to small... Pass bigger board size!"
-		);
-		return;
-	}
 	// create empty board:
-	let board = [];
-	for (let r = 0; r < size; r++) {
-		board[r] = [];
-		for (let c = 0; c < size; c++) {
-			board[r][c] = {
-				body: false,
-				food: false,
-				head: false,
-			};
-		}
-	}
+	let board = generateEmptyBoard(size);
 	// create init snake:
 	const snake = generateInitSnake();
 	// draw a snake into the board:
