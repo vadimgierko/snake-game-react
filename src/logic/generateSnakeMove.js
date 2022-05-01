@@ -1,18 +1,18 @@
-export default function generateSnakeMove(prevSnake, dir) {
-	console.log("prevsnake", prevSnake);
+export default function generateSnakeMove(prevSnake, dir, foodCoords) {
+	//console.log("prevsnake", prevSnake);
 	// calculate move in given direction:
 	let move = {};
-	if (dir === "right") {
+	if (dir === "ArrowRight") {
 		move = {
 			x: 1,
 			y: 0,
 		};
-	} else if (dir === "left") {
+	} else if (dir === "ArrowLeft") {
 		move = {
 			x: -1,
 			y: 0,
 		};
-	} else if (dir === "down") {
+	} else if (dir === "ArrowDown") {
 		move = {
 			x: 0,
 			y: 1,
@@ -24,15 +24,28 @@ export default function generateSnakeMove(prevSnake, dir) {
 		};
 	}
 	// add move to the snake
-	const [, ...remain] = prevSnake.body;
-	const updatedSnake = {
-		// move head:
-		head: {
-			x: prevSnake.head.x + move.x,
-			y: prevSnake.head.y + move.y,
-		},
-		// delete first body cell && push prevHead to body array:
-		body: [...remain, prevSnake.head],
-	};
+	let updatedSnake = {};
+	if (foodCoords) {
+		updatedSnake = {
+			// move head:
+			head: {
+				x: prevSnake.head.x + move.x,
+				y: prevSnake.head.y + move.y,
+			},
+			// delete first body cell && push prevHead to body array:
+			body: [...prevSnake.body, foodCoords],
+		};
+	} else {
+		const [, ...remain] = prevSnake.body;
+		updatedSnake = {
+			// move head:
+			head: {
+				x: prevSnake.head.x + move.x,
+				y: prevSnake.head.y + move.y,
+			},
+			// delete first body cell && push prevHead to body array:
+			body: [...remain, prevSnake.head],
+		};
+	}
 	return updatedSnake;
 }

@@ -6,28 +6,38 @@ import runGame from "./logic/runGame";
 
 export default function App() {
 	const [board, setBoard] = useState();
-	const [snake, setSnake] = useState();
-	const [food, setFood] = useState();
-	const [dir, setDir] = useState("right"); // direction of the move ("left", "up", "down")
-	const [start, setStart] = useState(false); // is game running (bool)
+	const [dir, setDir] = useState("ArrowRight");
 
 	useEffect(() => {
 		if (!board || (board && !board.length)) {
-			const initState = generateInitBoard(10);
-			//console.log("generated init board:", initBoard);
-			setBoard(initState.board);
-			setSnake(initState.snake);
-			setFood(initState.food);
+			const initBoard = generateInitBoard(10);
+			setBoard(initBoard);
 		}
-	}, [board, snake, food, dir]);
+	}, [board, dir]);
 
 	useEffect(() => {
-		const timer = setTimeout(() => {
-			const updatedBoard = runGame(board, dir);
-			setBoard(updatedBoard);
-		}, 1000);
-		return () => clearTimeout(timer);
-	}, [board, dir]);
+		if (board) {
+			// we set timer to update a board every second
+			const timer = setTimeout(() => {
+				// generate next snake move
+				const updatedBoard = runGame(board, dir);
+				// update the board with the new move
+				setBoard(updatedBoard);
+			}, 500);
+			return () => clearTimeout(timer);
+		}
+	}, [board]);
+
+	useEffect(() => {
+		const handleKeyDown = window.addEventListener("keydown", (e) => {
+			const key = e.code;
+			setDir(key);
+		});
+		//cleanup this component
+		return () => {
+			window.removeEventListener("keydown", handleKeyDown);
+		};
+	}, []);
 
 	return (
 		<div className="App">

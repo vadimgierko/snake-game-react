@@ -25,9 +25,5 @@ export default function generateInitBoard(size = 10) {
 	board[food.y][food.x].food = true;
 	// return init board
 	// with a snake in init position & random positioned piece of food:
-	return {
-		board: board,
-		snake: snake,
-		food: food,
-	};
+	return board;
 }

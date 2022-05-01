@@ -1,5 +1,6 @@
 import generateEmptyBoard from "./generateEmptyBoard";
 import generateSnakeMove from "./generateSnakeMove";
+import generateFood from "./generateFood";
 
 export default function runGame(board, dir) {
 	// find prevSnake & food
@@ -37,7 +38,7 @@ export default function runGame(board, dir) {
 		})
 	);
 	// calculate snake position after move:
-	const updatedSnake = generateSnakeMove(snake, dir);
+	let updatedSnake = generateSnakeMove(snake, dir);
 	// check if snake will collide with the walls
 	if (
 		updatedSnake.head.x >= 10 ||
@@ -45,8 +46,24 @@ export default function runGame(board, dir) {
 		updatedSnake.head.y >= 10 ||
 		updatedSnake.head.y < 0
 	) {
-		console.log("You lose...");
+		console.log("You lose... Snake collided with the wall...");
 		return board;
+	}
+	// check if snake would eat itself
+	updatedSnake.body.forEach((bodyCell) => {
+		if (
+			updatedSnake.head.x === bodyCell.x &&
+			updatedSnake.head.y === bodyCell.y
+		) {
+			console.log("You lose... Snake ate itself...");
+			return board;
+		}
+	});
+	// check if a food will be eaten
+	if (updatedSnake.head.x === food.x && updatedSnake.head.y === food.y) {
+		//updatedSnake.body.push(food);
+		updatedSnake = generateSnakeMove(snake, dir, food);
+		food = generateFood(updatedSnake);
 	}
 	// clear the board
 	const updatedBoard = generateEmptyBoard();
@@ -64,9 +81,8 @@ export default function runGame(board, dir) {
 	//=====================================
 	return updatedBoard;
 	//===================== TO DO:
-	// // TODO: check if there is no collision with the snake itself
-	// // TODO: if above true (no collisions):
-	// // TODO: check if a food will be eaten
-	// // TODO: if true: add one more cell to the snake, generate new food & THEN update a board with the updated snake
-	// // if false: update a board with the updated snake
+
+	// fix snake falling apart... dont know why...
+	// fix delay after keydown
+	// if true: add one more cell to the snake, generate new food & THEN update a board with the updated snake
 }
