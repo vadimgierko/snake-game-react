@@ -2,41 +2,7 @@ import generateEmptyBoard from "./generateEmptyBoard";
 import generateSnakeMove from "./generateSnakeMove";
 import generateFood from "./generateFood";
 
-export default function runGame(board, dir) {
-	// find prevSnake & food
-	let snake = {
-		head: {},
-		body: [],
-	};
-	let food = {};
-	board.forEach((row, r) =>
-		row.forEach((cell, c) => {
-			// search for head
-			if (cell.head) {
-				snake = {
-					...snake,
-					head: {
-						x: c,
-						y: r,
-					},
-				};
-			}
-			// search for body
-			if (cell.body) {
-				snake = {
-					...snake,
-					body: [...snake.body, { x: c, y: r }],
-				};
-			}
-			//search for food
-			if (cell.food) {
-				food = {
-					x: c,
-					y: r,
-				};
-			}
-		})
-	);
+export default function runGame(board, snake, food, dir, setStart) {
 	// calculate snake position after move:
 	let updatedSnake = generateSnakeMove(snake, dir);
 	// check if snake will collide with the walls
@@ -47,7 +13,12 @@ export default function runGame(board, dir) {
 		updatedSnake.head.y < 0
 	) {
 		console.log("You lose... Snake collided with the wall...");
-		return board;
+		setStart(false);
+		return {
+			board: board,
+			snake: snake,
+			food: food,
+		};
 	}
 	// check if snake would eat itself
 	updatedSnake.body.forEach((bodyCell) => {
@@ -56,13 +27,18 @@ export default function runGame(board, dir) {
 			updatedSnake.head.y === bodyCell.y
 		) {
 			console.log("You lose... Snake ate itself...");
-			return board;
+			setStart(false);
+			return {
+				board: board,
+				snake: snake,
+				food: food,
+			};
 		}
 	});
 	// check if a food will be eaten
 	if (updatedSnake.head.x === food.x && updatedSnake.head.y === food.y) {
 		//updatedSnake.body.push(food);
-		updatedSnake = generateSnakeMove(snake, dir, food);
+		updatedSnake = generateSnakeMove(updatedSnake, dir, food);
 		food = generateFood(updatedSnake);
 	}
 	// clear the board
@@ -79,10 +55,9 @@ export default function runGame(board, dir) {
 	// update board with the food
 	updatedBoard[food.y][food.x].food = true;
 	//=====================================
-	return updatedBoard;
-	//===================== TO DO:
-
-	// fix snake falling apart... dont know why...
-	// fix delay after keydown
-	// if true: add one more cell to the snake, generate new food & THEN update a board with the updated snake
+	return {
+		board: updatedBoard,
+		snake: updatedSnake,
+		food: food,
+	};
 }
