@@ -5,11 +5,15 @@
 
 table {
   margin: auto;
-  border-collapse: collapse;
   border: 1px solid grey;
 }
 
 td {
   width: 30px;
   height: 30px;
+  border: 1px solid white;
+}
+
+footer p {
+  color: gray
 }

@@ -16,7 +16,7 @@ export default function generateFood(snake, boardSize = 10) {
 				);
 				// if random x or y for food collide with eliminatedCoords,
 				// run a function again
-				coords = generateFood(eliminatedCoords, boardSize);
+				coords = generateFood(snake, boardSize);
 			}
 		});
 	}
