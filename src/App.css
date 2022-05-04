@@ -13,3 +13,7 @@ td {
   height: 30px;
   border: 1px solid white;
 }
+
+footer p {
+  color: gray
+}
