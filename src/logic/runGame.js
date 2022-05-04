@@ -2,10 +2,12 @@ import generateEmptyBoard from "./generateEmptyBoard";
 import generateSnakeMove from "./generateSnakeMove";
 import generateFood from "./generateFood";
 
-export default function runGame(snake, food, eatenFood, dir, setStart) {
+export default function runGame(state, dir, endGame) {
 	// calculate snake position after move:
-	let updatedEatenFood = eatenFood;
-	let updatedSnake = generateSnakeMove(snake, dir, eatenFood);
+	let updatedEatenFood = state.eatenFood;
+	let food = state.food;
+
+	let updatedSnake = generateSnakeMove(state.snake, dir, state.eatenFood);
 	// check if snake will collide with the walls
 	if (
 		updatedSnake.head.x >= 10 ||
@@ -13,14 +15,11 @@ export default function runGame(snake, food, eatenFood, dir, setStart) {
 		updatedSnake.head.y >= 10 ||
 		updatedSnake.head.y < 0
 	) {
-		console.log(
-			"You lose... Snake collided with the wall... Refresh the browser to play again!"
-		);
-		setStart(false);
-		alert(
-			"You lose... Snake collided with the wall... Refresh the browser to play again!"
-		);
-		return;
+		const message =
+			"You lose... Snake collided with the wall... Press space key on your keyboard or press the button below the board to play again!";
+		console.log(message);
+		endGame();
+		alert(message);
 	}
 	// check if snake would eat itself
 	updatedSnake.body.forEach((bodyCell) => {
@@ -28,13 +27,11 @@ export default function runGame(snake, food, eatenFood, dir, setStart) {
 			updatedSnake.head.x === bodyCell.x &&
 			updatedSnake.head.y === bodyCell.y
 		) {
-			console.log(
-				"You lose... Snake ate itself... Refresh the browser to play again!"
-			);
-			setStart(false);
-			alert(
-				"You lose... Snake ate itself... Refresh the browser to play again!"
-			);
+			const message =
+				"You lose... Snake ate itself... Press space key on your keyboard or press the button below the board to play again!";
+			console.log(message);
+			endGame();
+			alert(message);
 			return;
 		}
 	});

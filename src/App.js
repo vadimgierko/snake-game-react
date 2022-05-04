@@ -1,40 +1,83 @@
 import "./App.css";
 import { useCallback, useEffect, useState } from "react";
 import Screen from "./components/Screen";
-import generateInitBoard from "./logic/generateInitBoard";
 import runGame from "./logic/runGame";
-import generateFood from "./logic/generateFood";
-import generateInitSnake from "./logic/generateInitSnake";
+import generateInitState from "./logic/generateInitState";
 
 const KEYS = ["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp"];
 
 export default function App() {
-	const [board, setBoard] = useState();
-	const [snake, setSnake] = useState();
-	const [food, setFood] = useState();
-	const [eatenFood, setEatenFood] = useState(null);
+	const [state, setState] = useState({
+		board: null,
+		snake: null,
+		food: null,
+		eatenFood: null,
+	});
+	const [game, setGame] = useState({
+		start: false,
+		pause: false,
+		end: false,
+	});
 	const [dir, setDir] = useState("ArrowRight");
-	const [start, setStart] = useState(false);
+
+	function startGame() {
+		setGame({
+			start: true,
+			pause: false,
+			end: false,
+		});
+	}
+
+	function pauseGame() {
+		setGame({
+			start: false,
+			pause: true,
+			end: false,
+		});
+	}
+
+	function endGame() {
+		setState({
+			board: null,
+			snake: null,
+			food: null,
+			eatenFood: null,
+		});
+		setGame({
+			start: false,
+			pause: false,
+			end: true,
+		});
+		setDir("ArrowRight");
+	}
 
 	const makeMove = useCallback(() => {
 		// generate next snake move
-		const updatedState = runGame(snake, food, eatenFood, dir, setStart);
-		const updatedBoard = updatedState.board;
-		const updatedSnake = updatedState.snake;
-		const updatedFood = updatedState.food;
-		const updatedEatenFood = updatedState.eatenFood;
-		// update the board with the new move
-		setBoard(updatedBoard);
-		setSnake(updatedSnake);
-		setFood(updatedFood);
-		setEatenFood(updatedEatenFood);
-	}, [snake, food, eatenFood, dir]);
+		const updatedState = runGame(state, dir, endGame);
+		if (game.start) {
+			setState(updatedState);
+		} else if (game.end) {
+			// setState({
+			// 	board: null,
+			// 	snake: null,
+			// 	food: null,
+			// 	eatenFood: null,
+			// });
+			// setDir("ArrowRight");
+		}
+	}, [state, dir, game]);
 
 	const handleKeyDown = useCallback(
 		(e) => {
 			const key = e.code;
 			if (key === "Space") {
-				start ? setStart(false) : setStart(true);
+				if (game.start) {
+					pauseGame();
+				} else if (game.pause) {
+					startGame();
+				} else {
+					startGame();
+				}
 			} else {
 				if (KEYS.includes(key)) {
 					if (
@@ -50,30 +93,29 @@ export default function App() {
 				}
 			}
 		},
-		[setDir, start, dir]
+		[dir, game]
 	);
 
 	useEffect(() => {
+		const board = state.board;
 		if (!board || (board && !board.length)) {
-			const initSnake = generateInitSnake();
-			const initFood = generateFood(initSnake, 10);
-			const initBoard = generateInitBoard(initSnake, initFood, 10);
-			setSnake(initSnake);
-			setFood(initFood);
-			setBoard(initBoard);
+			const initState = generateInitState();
+			setState((prevState) => {
+				return { ...prevState, ...initState };
+			});
 		}
-	}, [board]);
+	}, [state]);
 
 	useEffect(() => {
 		let timer;
-		if (start) {
+		if (game.start) {
 			// we set timer to update a board every 1/2 second
 			timer = setTimeout(makeMove, 250);
 			return () => clearTimeout(timer);
 		} else {
 			return () => clearTimeout(timer);
 		}
-	}, [makeMove, start]);
+	}, [game.start, makeMove]);
 
 	useEffect(() => {
 		window.addEventListener("keydown", handleKeyDown);
@@ -83,6 +125,8 @@ export default function App() {
 		};
 	}, [handleKeyDown]);
 
+	if (!state.board) return null;
+
 	return (
 		<div className="App">
 			<header>
@@ -90,10 +134,28 @@ export default function App() {
 				<hr />
 			</header>
 			<main>
-				<Screen board={board} />
+				<Screen board={state.board} />
 				<br />
-				<button onClick={() => (start ? setStart(false) : setStart(true))}>
-					{start ? "pause" : "start"}
+				<button
+					onClick={() => {
+						if (game.start) {
+							pauseGame();
+						} else if (game.pause) {
+							startGame();
+						} else if (game.end) {
+							startGame();
+						} else {
+							startGame();
+						}
+					}}
+				>
+					{game.start
+						? "pause"
+						: !game.start && !game.pause && !game.end
+						? "start"
+						: null}
+					{game.pause && "start"}
+					{game.end && "restart"}
 				</button>
 			</main>
 			<br />
