@@ -10,6 +10,12 @@ export default function generateInitState() {
 		board: initBoard,
 		snake: initSnake,
 		food: initFood,
+		eatenFood: null,
+		dir: "ArrowRight",
+		prevDir: null,
+		start: false,
+		pause: false,
+		end: false,
 	};
 	return initState;
 }
