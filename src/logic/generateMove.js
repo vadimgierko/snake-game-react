@@ -41,6 +41,7 @@ export default function generateMove(state, dir) {
 		) {
 			updatedState.eatenFood = updatedState.food;
 			updatedState.food = generateFood(updatedState.snake);
+			updatedState.score = updatedState.score + 1;
 		} else {
 			updatedState.eatenFood = null;
 		}

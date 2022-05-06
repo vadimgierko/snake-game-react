@@ -29,11 +29,11 @@ export default function Footer() {
 					CodeSandbox demo
 				</a>
 			</p>
-			<p>
-				The game was written in React entirely by me for entertainment and
-				learning purposes. I have not used any tutorial to be able to test
-				myself in writing logic & handle timer & event listeners.
-			</p>
+			{/* <p>
+		  The game was written in React entirely by me for entertainment and
+		  learning purposes. I have not used any tutorial to be able to test
+		  myself in writing logic & handle timer & event listeners.
+		</p> */}
 		</footer>
 	);
 }

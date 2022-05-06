@@ -14,6 +14,7 @@ const INIT_STATE = generateInitState();
 export default function App() {
 	const [state, dispatch] = useReducer(reducer, INIT_STATE);
 	const [dir, setDir] = useState("ArrowRight");
+	const [isTouchScreen, setTouchScreen] = useState(false);
 
 	const makeMove = useCallback(() => {
 		const updatedState = generateMove(state, dir);
@@ -74,30 +75,97 @@ export default function App() {
 		};
 	}, [handleKeyDown]);
 
+	useEffect(() => {
+		if ("ontouchstart" in document.documentElement) {
+			setTouchScreen(true);
+		}
+		// or we can check the size of the screen to detect if that's a mobile:
+		// let isMobile = window.matchMedia("only screen and (max-width: 480px)").matches;
+	}, []);
+
 	return (
 		<div className="App">
 			<Header />
 			<main>
 				<Screen board={state.board} />
-				<br />
-				<button
-					onClick={() => {
-						if (state.end) {
-							dispatch({ type: "reset-game" });
-							setDir("ArrowRight");
-						} else {
-							if (state.start) {
-								dispatch({ type: "pause-game" });
+				{isTouchScreen ? (
+					<div className="controller" style={{ marginTop: "1em" }}>
+						<div className="row">
+							<button
+								className="controller-button"
+								onClick={() => {
+									setDir("ArrowUp");
+								}}
+							>
+								up
+							</button>
+						</div>
+						<div className="row">
+							<button
+								className="controller-button"
+								onClick={() => {
+									setDir("ArrowLeft");
+								}}
+							>
+								left
+							</button>
+							<button
+								className="controller-button"
+								style={{ backgroundColor: "green", color: "white" }}
+								onClick={() => {
+									if (state.end) {
+										dispatch({ type: "reset-game" });
+										setDir("ArrowRight");
+									} else {
+										if (state.start) {
+											dispatch({ type: "pause-game" });
+										} else {
+											dispatch({ type: "start-game" });
+										}
+									}
+								}}
+							>
+								{state.end ? "restart" : state.start ? "pause" : "start"}
+							</button>
+							<button
+								className="controller-button"
+								onClick={() => {
+									setDir("ArrowRight");
+								}}
+							>
+								right
+							</button>
+						</div>
+						<button
+							className="controller-button"
+							onClick={() => {
+								setDir("ArrowDown");
+							}}
+						>
+							down
+						</button>
+					</div>
+				) : (
+					<button
+						style={{ margin: "1em 1em 0em 1em" }}
+						onClick={() => {
+							if (state.end) {
+								dispatch({ type: "reset-game" });
+								setDir("ArrowRight");
 							} else {
-								dispatch({ type: "start-game" });
+								if (state.start) {
+									dispatch({ type: "pause-game" });
+								} else {
+									dispatch({ type: "start-game" });
+								}
 							}
-						}
-					}}
-				>
-					{state.end ? "reset" : state.start ? "pause" : "start"}
-				</button>
+						}}
+					>
+						{state.end ? "reset" : state.start ? "pause" : "start"}
+					</button>
+				)}
+				<p>score: {state.score}</p>
 			</main>
-			<br />
 			<hr />
 			<Footer />
 		</div>
