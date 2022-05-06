@@ -1,10 +1,4 @@
 export default function Screen({ board }) {
-	if (!board || (board && !board.length))
-		return (
-			<p className="game-screen">
-				There is no board generated... Wait a moment
-			</p>
-		);
 	return (
 		<table className="game-screen">
 			<tbody>

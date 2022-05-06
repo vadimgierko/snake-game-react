@@ -1,40 +1,43 @@
 import "./App.css";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useReducer, useState } from "react";
+import Header from "./components/Header";
 import Screen from "./components/Screen";
-import generateInitBoard from "./logic/generateInitBoard";
-import runGame from "./logic/runGame";
-import generateFood from "./logic/generateFood";
-import generateInitSnake from "./logic/generateInitSnake";
+import Footer from "./components/Footer";
+import reducer from "./reducer/reducer";
+import generateInitState from "./logic/generateInitState";
+import generateMove from "./logic/generateMove";
 
 const KEYS = ["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp"];
 
+const INIT_STATE = generateInitState();
+
 export default function App() {
-	const [board, setBoard] = useState();
-	const [snake, setSnake] = useState();
-	const [food, setFood] = useState();
-	const [eatenFood, setEatenFood] = useState(null);
+	const [state, dispatch] = useReducer(reducer, INIT_STATE);
 	const [dir, setDir] = useState("ArrowRight");
-	const [start, setStart] = useState(false);
+	const [isTouchScreen, setTouchScreen] = useState(false);
 
 	const makeMove = useCallback(() => {
-		// generate next snake move
-		const updatedState = runGame(snake, food, eatenFood, dir, setStart);
-		const updatedBoard = updatedState.board;
-		const updatedSnake = updatedState.snake;
-		const updatedFood = updatedState.food;
-		const updatedEatenFood = updatedState.eatenFood;
-		// update the board with the new move
-		setBoard(updatedBoard);
-		setSnake(updatedSnake);
-		setFood(updatedFood);
-		setEatenFood(updatedEatenFood);
-	}, [snake, food, eatenFood, dir]);
+		const updatedState = generateMove(state, dir);
+		dispatch({
+			type: "update-state",
+			payload: { state: updatedState },
+		});
+	}, [state, dir]);
 
 	const handleKeyDown = useCallback(
 		(e) => {
 			const key = e.code;
 			if (key === "Space") {
-				start ? setStart(false) : setStart(true);
+				if (state.end) {
+					dispatch({ type: "reset-game" });
+					setDir("ArrowRight");
+				} else {
+					if (state.start) {
+						dispatch({ type: "pause-game" });
+					} else {
+						dispatch({ type: "start-game" });
+					}
+				}
 			} else {
 				if (KEYS.includes(key)) {
 					if (
@@ -50,30 +53,19 @@ export default function App() {
 				}
 			}
 		},
-		[setDir, start, dir]
+		[state, dir]
 	);
 
 	useEffect(() => {
-		if (!board || (board && !board.length)) {
-			const initSnake = generateInitSnake();
-			const initFood = generateFood(initSnake, 10);
-			const initBoard = generateInitBoard(initSnake, initFood, 10);
-			setSnake(initSnake);
-			setFood(initFood);
-			setBoard(initBoard);
-		}
-	}, [board]);
-
-	useEffect(() => {
 		let timer;
-		if (start) {
+		if (state.start) {
 			// we set timer to update a board every 1/2 second
 			timer = setTimeout(makeMove, 250);
 			return () => clearTimeout(timer);
 		} else {
 			return () => clearTimeout(timer);
 		}
-	}, [makeMove, start]);
+	}, [makeMove, state]);
 
 	useEffect(() => {
 		window.addEventListener("keydown", handleKeyDown);
@@ -83,52 +75,99 @@ export default function App() {
 		};
 	}, [handleKeyDown]);
 
+	useEffect(() => {
+		if ("ontouchstart" in document.documentElement) {
+			setTouchScreen(true);
+		}
+		// or we can check the size of the screen to detect if that's a mobile:
+		// let isMobile = window.matchMedia("only screen and (max-width: 480px)").matches;
+	}, []);
+
 	return (
 		<div className="App">
-			<header>
-				<h1>Snake Game</h1>
-				<hr />
-			</header>
+			<Header />
 			<main>
-				<Screen board={board} />
-				<br />
-				<button onClick={() => (start ? setStart(false) : setStart(true))}>
-					{start ? "pause" : "start"}
-				</button>
+				<Screen board={state.board} />
+				{isTouchScreen ? (
+					<div className="controller" style={{ marginTop: "1em" }}>
+						<div className="row">
+							<button
+								className="controller-button"
+								onClick={() => {
+									setDir("ArrowUp");
+								}}
+							>
+								up
+							</button>
+						</div>
+						<div className="row">
+							<button
+								className="controller-button"
+								onClick={() => {
+									setDir("ArrowLeft");
+								}}
+							>
+								left
+							</button>
+							<button
+								className="controller-button"
+								style={{ backgroundColor: "green", color: "white" }}
+								onClick={() => {
+									if (state.end) {
+										dispatch({ type: "reset-game" });
+										setDir("ArrowRight");
+									} else {
+										if (state.start) {
+											dispatch({ type: "pause-game" });
+										} else {
+											dispatch({ type: "start-game" });
+										}
+									}
+								}}
+							>
+								{state.end ? "restart" : state.start ? "pause" : "start"}
+							</button>
+							<button
+								className="controller-button"
+								onClick={() => {
+									setDir("ArrowRight");
+								}}
+							>
+								right
+							</button>
+						</div>
+						<button
+							className="controller-button"
+							onClick={() => {
+								setDir("ArrowDown");
+							}}
+						>
+							down
+						</button>
+					</div>
+				) : (
+					<button
+						style={{ margin: "1em 1em 0em 1em" }}
+						onClick={() => {
+							if (state.end) {
+								dispatch({ type: "reset-game" });
+								setDir("ArrowRight");
+							} else {
+								if (state.start) {
+									dispatch({ type: "pause-game" });
+								} else {
+									dispatch({ type: "start-game" });
+								}
+							}
+						}}
+					>
+						{state.end ? "reset" : state.start ? "pause" : "start"}
+					</button>
+				)}
+				<p>score: {state.score}</p>
 			</main>
-			<br />
 			<hr />
-			<footer>
-				<p>
-					created by{" "}
-					<a
-						href="https://github.com/vadimgierko"
-						target="_blank"
-						rel="noreferrer"
-					>
-						Vadim Gierko
-					</a>{" "}
-					| 2022
-				</p>
-				<p>
-					<a
-						href="https://github.com/vadimgierko/snake-game-react"
-						target="_blank"
-						rel="noreferrer"
-					>
-						source code on GitHub
-					</a>{" "}
-					|{" "}
-					<a href="" target="_blank" rel="noreferrer">
-						CodeSandbox demo
-					</a>
-				</p>
-				<p>
-					The game was written in React entirely by me for entertainment and
-					learning purposes. I have not used any tutorial to be able to test
-					myself in writing logic & handle timer & event listeners.
-				</p>
-			</footer>
+			<Footer />
 		</div>
 	);
 }

@@ -11,9 +11,9 @@ export default function generateFood(snake, boardSize = 10) {
 	if (eliminatedCoords && eliminatedCoords.length) {
 		eliminatedCoords.forEach((element) => {
 			if (element.x === coords.x && element.y === coords.y) {
-				console.log(
-					"random x or y for food collide with eliminatedCoords... generate new one!"
-				);
+				// console.log(
+				//   "random x or y for food collide with eliminatedCoords... generate new one!"
+				// );
 				// if random x or y for food collide with eliminatedCoords,
 				// run a function again
 				coords = generateFood(snake, boardSize);
