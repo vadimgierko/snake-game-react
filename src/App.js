@@ -13,16 +13,23 @@ const INIT_STATE = generateInitState();
 
 export default function App() {
 	const [state, dispatch] = useReducer(reducer, INIT_STATE);
+	const [timer, setTimer] = useState(0);
+	const [seconds, setSeconds] = useState(0);
+	const [minutes, setMinutes] = useState(0);
 	const [dir, setDir] = useState("ArrowRight");
 	const [isTouchScreen, setTouchScreen] = useState(false);
 
-	const makeMove = useCallback(() => {
-		const updatedState = generateMove(state, dir);
-		dispatch({
-			type: "update-state",
-			payload: { state: updatedState },
-		});
-	}, [state, dir]);
+	const makeMove = useCallback(
+		(tick) => {
+			//console.log("tick/timer:", tick);
+			const updatedState = generateMove(state, dir);
+			dispatch({
+				type: "update-state",
+				payload: { state: updatedState },
+			});
+		},
+		[state, dir]
+	);
 
 	const handleKeyDown = useCallback(
 		(e) => {
@@ -57,15 +64,20 @@ export default function App() {
 	);
 
 	useEffect(() => {
-		let timer;
 		if (state.start) {
-			// we set timer to update a board every 1/2 second
-			timer = setTimeout(makeMove, 250);
-			return () => clearTimeout(timer);
-		} else {
-			return () => clearTimeout(timer);
+			const tick = setTimeout(() => {
+				const updatedTimer = timer + 1;
+				timer % 4 === 0 && setSeconds((prevState) => prevState + 1);
+				timer % 240 === 0 && setMinutes((prevState) => prevState + 1);
+				setTimer(updatedTimer);
+			}, 250);
+			return () => clearTimeout(tick);
 		}
-	}, [makeMove, state]);
+	}, [timer, state]);
+
+	useEffect(() => {
+		makeMove(timer);
+	}, [timer]);
 
 	useEffect(() => {
 		window.addEventListener("keydown", handleKeyDown);
@@ -87,6 +99,10 @@ export default function App() {
 		<div className="App">
 			<Header />
 			<main>
+				<p>
+					{minutes < 10 ? "0" + minutes : minutes} :{" "}
+					{seconds < 10 ? "0" + seconds : seconds}
+				</p>
 				<Screen board={state.board} />
 				{isTouchScreen ? (
 					<div className="controller" style={{ marginTop: "1em" }}>
