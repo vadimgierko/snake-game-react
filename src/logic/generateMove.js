@@ -15,9 +15,6 @@ export default function generateMove(state, dir) {
 		updatedState.pause = false;
 		updatedState.start = false;
 		updatedState.end = true;
-		alert(
-			"You lose... Snake collided with the wall... To play again press space key or restart button or refresh the browser!"
-		);
 	}
 	// check if snake would eat itself
 	updatedState.snake.body.forEach((bodyCell) => {
@@ -28,9 +25,6 @@ export default function generateMove(state, dir) {
 			updatedState.pause = false;
 			updatedState.start = false;
 			updatedState.end = true;
-			alert(
-				"You lose... Snake ate itself... To play again press space key or restart button or refresh the browser!"
-			);
 		}
 	});
 	if (updatedState.start) {
