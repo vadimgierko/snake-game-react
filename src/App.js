@@ -1,11 +1,19 @@
-import "./App.css";
 import { useCallback, useEffect, useReducer, useState } from "react";
 import Header from "./components/Header";
+//import Clock from "./components/Clock";
+import SpeedController from "./components/SpeedController";
 import Screen from "./components/Screen";
+import TouchController from "./components/TouchController";
 import Footer from "./components/Footer";
 import reducer from "./reducer/reducer";
 import generateInitState from "./logic/generateInitState";
 import generateMove from "./logic/generateMove";
+import {
+	BsArrowLeftSquare,
+	BsArrowRightSquare,
+	BsArrowUpSquare,
+	BsArrowDownSquare,
+} from "react-icons/bs";
 
 const KEYS = ["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp"];
 
@@ -13,15 +21,13 @@ const INIT_STATE = generateInitState();
 
 export default function App() {
 	const [state, dispatch] = useReducer(reducer, INIT_STATE);
+	const [speed, setSpeed] = useState(500); // 1000 = 1 second // 1000 should be dividable by speed
 	const [timer, setTimer] = useState(0);
-	const [seconds, setSeconds] = useState(0);
-	const [minutes, setMinutes] = useState(0);
 	const [dir, setDir] = useState("ArrowRight");
 	const [isTouchScreen, setTouchScreen] = useState(false);
 
 	const makeMove = useCallback(
 		(tick) => {
-			//console.log("tick/timer:", tick);
 			const updatedState = generateMove(state, dir);
 			dispatch({
 				type: "update-state",
@@ -34,7 +40,7 @@ export default function App() {
 	const handleKeyDown = useCallback(
 		(e) => {
 			const key = e.code;
-			if (key === "Space") {
+			if (key === "Space" || key === "Enter") {
 				if (state.end) {
 					dispatch({ type: "reset-game" });
 					setDir("ArrowRight");
@@ -64,16 +70,21 @@ export default function App() {
 	);
 
 	useEffect(() => {
+		if (state.end) {
+			alert(
+				"You lose... To play again press space key or restart button or refresh the browser!"
+			);
+		}
+	}, [state.end]);
+
+	useEffect(() => {
 		if (state.start) {
 			const tick = setTimeout(() => {
-				const updatedTimer = timer + 1;
-				timer % 4 === 0 && setSeconds((prevState) => prevState + 1);
-				timer % 240 === 0 && setMinutes((prevState) => prevState + 1);
-				setTimer(updatedTimer);
-			}, 250);
+				setTimer((prevState) => prevState + 1);
+			}, speed);
 			return () => clearTimeout(tick);
 		}
-	}, [timer, state]);
+	}, [speed, state]);
 
 	useEffect(() => {
 		makeMove(timer);
@@ -99,90 +110,29 @@ export default function App() {
 		<div className="App">
 			<Header />
 			<main>
-				<p>
-					{minutes < 10 ? "0" + minutes : minutes} :{" "}
-					{seconds < 10 ? "0" + seconds : seconds}
-				</p>
-				<Screen board={state.board} />
-				{isTouchScreen ? (
-					<div className="controller" style={{ marginTop: "1em" }}>
-						<div className="row">
-							<button
-								className="controller-button"
-								onClick={() => {
-									setDir("ArrowUp");
-								}}
-							>
-								up
-							</button>
+				{/* <Clock speed={speed} timerValue={timer} /> */}
+				<SpeedController speed={speed} setSpeed={setSpeed} />
+				<Screen board={state.board} score={state.score} />
+				<div style={{ marginTop: "1em" }}>
+					{isTouchScreen ? (
+						<TouchController
+							setDir={setDir}
+							end={state.end}
+							start={state.start}
+							dispatch={dispatch}
+						/>
+					) : (
+						<div>
+							<p>Press Enter or Space key to start/ pause/ restart game.</p>
+							<p>
+								Control the snake's movement with the <BsArrowLeftSquare />{" "}
+								<BsArrowRightSquare /> <BsArrowUpSquare /> <BsArrowDownSquare />{" "}
+								keys.
+							</p>
 						</div>
-						<div className="row">
-							<button
-								className="controller-button"
-								onClick={() => {
-									setDir("ArrowLeft");
-								}}
-							>
-								left
-							</button>
-							<button
-								className="controller-button"
-								style={{ backgroundColor: "green", color: "white" }}
-								onClick={() => {
-									if (state.end) {
-										dispatch({ type: "reset-game" });
-										setDir("ArrowRight");
-									} else {
-										if (state.start) {
-											dispatch({ type: "pause-game" });
-										} else {
-											dispatch({ type: "start-game" });
-										}
-									}
-								}}
-							>
-								{state.end ? "restart" : state.start ? "pause" : "start"}
-							</button>
-							<button
-								className="controller-button"
-								onClick={() => {
-									setDir("ArrowRight");
-								}}
-							>
-								right
-							</button>
-						</div>
-						<button
-							className="controller-button"
-							onClick={() => {
-								setDir("ArrowDown");
-							}}
-						>
-							down
-						</button>
-					</div>
-				) : (
-					<button
-						style={{ margin: "1em 1em 0em 1em" }}
-						onClick={() => {
-							if (state.end) {
-								dispatch({ type: "reset-game" });
-								setDir("ArrowRight");
-							} else {
-								if (state.start) {
-									dispatch({ type: "pause-game" });
-								} else {
-									dispatch({ type: "start-game" });
-								}
-							}
-						}}
-					>
-						{state.end ? "reset" : state.start ? "pause" : "start"}
-					</button>
-				)}
-				<p>score: {state.score}</p>
+					)}
+				</div>
 			</main>
-			<hr />
 			<Footer />
 		</div>
 	);

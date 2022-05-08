@@ -1,0 +1,22 @@
+body { 
+  font-family: 'Courier New', Courier, monospace;
+  text-align: center;
+  background-color: rgb(14, 9, 29);
+  color: rgb(195, 195, 202);
+}
+
+table {
+  margin: auto;
+  border: 1px solid grey;
+}
+ 
+td {
+  width: 25px;
+  height: 25px;
+  border: 1px solid transparent;
+}
+
+a:hover {
+  color: white
+}
+  

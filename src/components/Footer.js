@@ -2,7 +2,7 @@ export default function Footer() {
 	return (
 		<footer>
 			<p>
-				created by{" "}
+				&copy; 2022{" "}
 				<a
 					href="https://github.com/vadimgierko"
 					target="_blank"
@@ -10,15 +10,13 @@ export default function Footer() {
 				>
 					Vadim Gierko
 				</a>{" "}
-				| 2022
-			</p>
-			<p>
+				|{" "}
 				<a
 					href="https://github.com/vadimgierko/snake-game-react"
 					target="_blank"
 					rel="noreferrer"
 				>
-					source code on GitHub
+					source code
 				</a>{" "}
 				|{" "}
 				<a
@@ -29,11 +27,6 @@ export default function Footer() {
 					CodeSandbox demo
 				</a>
 			</p>
-			{/* <p>
-		  The game was written in React entirely by me for entertainment and
-		  learning purposes. I have not used any tutorial to be able to test
-		  myself in writing logic & handle timer & event listeners.
-		</p> */}
 		</footer>
 	);
 }
