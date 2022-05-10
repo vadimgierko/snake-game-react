@@ -1,22 +1,72 @@
-body { 
-  font-family: 'Courier New', Courier, monospace;
+html,
+body {
+  font-family: "Courier New", Courier, monospace;
   text-align: center;
-  background-color: rgb(14, 9, 29);
+  background-color: rgb(18, 17, 19);
   color: rgb(195, 195, 202);
 }
 
-table {
+/* table */
+.board {
+  width: 50vh;
+  height: 50vh;
   margin: auto;
   border: 1px solid grey;
 }
- 
-td {
-  width: 25px;
-  height: 25px;
+
+/* td */
+.board-cell {
+  width: 10%;
+  height: 10%;
   border: 1px solid transparent;
 }
 
-a:hover {
-  color: white
+/* snake cells */
+.head-cell {
+  background-color: green;
 }
-  
+
+.body-cell {
+  background-color: grey;
+}
+
+/* food cells */
+.food-cell {
+  background-color: #f24236;
+}
+
+footer {
+  text-align: center;
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+}
+
+/* links */
+a {
+  color: rgb(195, 195, 202);
+}
+
+a:hover {
+  color: white;
+}
+
+/* mobile styles */
+@media only screen and (max-width: 576px) {
+  h1 {
+    font-size: 22px;
+  }
+
+  .board {
+    width: 90vw;
+    height: 90vw;
+  }
+
+  .controller-button {
+    margin: 0.25em;
+  }
+
+  footer {
+    font-size: small;
+  }
+}
