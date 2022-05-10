@@ -1,29 +1,30 @@
+// import react hooks here:
 import { useCallback, useEffect, useReducer, useState } from "react";
-import Header from "./components/Header";
-//import Clock from "./components/Clock";
+// import layout components here:
+import Header from "./components/layout/Header";
+import Footer from "./components/layout/Footer";
+// import layout data to fulfill layout components here:
+import { LAYOUT_DATA } from "./data/layout";
+// import game instructions here:
+import Instructions from "./components/Instructions";
+// import other components here:
 import SpeedController from "./components/SpeedController";
-import Screen from "./components/Screen";
+import Board from "./components/Board";
 import TouchController from "./components/TouchController";
-import Footer from "./components/Footer";
+// import reducer function here:
 import reducer from "./reducer/reducer";
+// import logic functions here:
 import generateInitState from "./logic/generateInitState";
 import generateMove from "./logic/generateMove";
-import {
-	BsArrowLeftSquare,
-	BsArrowRightSquare,
-	BsArrowUpSquare,
-	BsArrowDownSquare,
-} from "react-icons/bs";
 
-const KEYS = ["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp"];
-
+const DIR_KEYS = ["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp"];
 const INIT_STATE = generateInitState();
 
 export default function App() {
 	const [state, dispatch] = useReducer(reducer, INIT_STATE);
 	const [speed, setSpeed] = useState(500); // 1000 = 1 second // 1000 should be dividable by speed
-	const [timer, setTimer] = useState(0);
-	const [dir, setDir] = useState("ArrowRight");
+	const [timer, setTimer] = useState(0); // makeMove() is binded to timer changes
+	const [dir, setDir] = useState("ArrowRight"); // direction of the move
 	const [isTouchScreen, setTouchScreen] = useState(false);
 
 	const makeMove = useCallback(
@@ -52,7 +53,7 @@ export default function App() {
 					}
 				}
 			} else {
-				if (KEYS.includes(key)) {
+				if (DIR_KEYS.includes(key)) {
 					if (
 						(key === "ArrowRight" && dir === "ArrowLeft") ||
 						(key === "ArrowLeft" && dir === "ArrowRight") ||
@@ -69,6 +70,7 @@ export default function App() {
 		[state, dir]
 	);
 
+	// end / lose game screen / alert
 	useEffect(() => {
 		if (state.end) {
 			alert(
@@ -77,6 +79,7 @@ export default function App() {
 		}
 	}, [state.end]);
 
+	// start timer if game is started (also restarted after fail or pause)
 	useEffect(() => {
 		if (state.start) {
 			const tick = setTimeout(() => {
@@ -86,10 +89,12 @@ export default function App() {
 		}
 	}, [speed, state]);
 
+	// generate move on each timer change:
 	useEffect(() => {
 		makeMove(timer);
 	}, [timer]);
 
+	// listen to keys pressed:
 	useEffect(() => {
 		window.addEventListener("keydown", handleKeyDown);
 		//cleanup this component
@@ -98,6 +103,10 @@ export default function App() {
 		};
 	}, [handleKeyDown]);
 
+	// check if game is run on touch screen (mobile, tablet)
+	// that's needed to:
+	// enable touch screen controller if touch screen detected
+	// or show instructions how to play for desktops
 	useEffect(() => {
 		if ("ontouchstart" in document.documentElement) {
 			setTouchScreen(true);
@@ -108,11 +117,10 @@ export default function App() {
 
 	return (
 		<div className="App">
-			<Header />
+			<Header title={LAYOUT_DATA.header.title} />
 			<main>
-				{/* <Clock speed={speed} timerValue={timer} /> */}
 				<SpeedController speed={speed} setSpeed={setSpeed} />
-				<Screen board={state.board} score={state.score} />
+				<Board board={state.board} score={state.score} />
 				<div style={{ marginTop: "1em" }}>
 					{isTouchScreen ? (
 						<TouchController
@@ -122,18 +130,14 @@ export default function App() {
 							dispatch={dispatch}
 						/>
 					) : (
-						<div>
-							<p>Press Enter or Space key to start/ pause/ restart game.</p>
-							<p>
-								Control the snake's movement with the <BsArrowLeftSquare />{" "}
-								<BsArrowRightSquare /> <BsArrowUpSquare /> <BsArrowDownSquare />{" "}
-								keys.
-							</p>
-						</div>
+						<Instructions />
 					)}
 				</div>
 			</main>
-			<Footer />
+			<Footer
+				releaseYear={LAYOUT_DATA.footer.releaseYear}
+				links={LAYOUT_DATA.footer.links}
+			/>
 		</div>
 	);
 }

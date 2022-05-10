@@ -9,44 +9,41 @@ import {
 	BsPauseCircle,
 } from "react-icons/bs";
 
+const iconSize = 50; // change icon size here
+
 export default function TouchController({ setDir, dispatch, start, end }) {
 	const BUTTONS = [
 		// 1. row
 		[
 			{
-				className: "controller-button",
-				icon: <BsArrowUpSquare />,
+				icon: <BsArrowUpSquare size={iconSize} />,
 				dir: "ArrowUp",
 			},
 		],
 		// 2. row
 		[
 			{
-				className: "controller-button",
-				icon: <BsArrowLeftSquare />,
+				icon: <BsArrowLeftSquare size={iconSize} />,
 				dir: "ArrowLeft",
 			},
 			{
-				className: "controller-button start-button",
 				icon: end ? (
-					<BsArrowClockwise />
+					<BsArrowClockwise size={iconSize} />
 				) : start ? (
-					<BsPauseCircle />
+					<BsPauseCircle size={iconSize} />
 				) : (
-					<BsPlayCircle />
+					<BsPlayCircle size={iconSize} />
 				),
 			},
 			{
-				className: "controller-button",
-				icon: <BsArrowRightSquare />,
+				icon: <BsArrowRightSquare size={iconSize} />,
 				dir: "ArrowRight",
 			},
 		],
 		// 3. row
 		[
 			{
-				className: "controller-button",
-				icon: <BsArrowDownSquare />,
+				icon: <BsArrowDownSquare size={iconSize} />,
 				dir: "ArrowDown",
 			},
 		],
@@ -58,15 +55,11 @@ export default function TouchController({ setDir, dispatch, start, end }) {
 				<div className="row" key={"btn-row-" + r}>
 					{row.map((btn, b) => (
 						<ControllerButton
-							key={
-								btn.className.includes("start-button")
-									? btn.className
-									: "controller-button-" + b
-							}
-							className={btn.className}
+							key={"controller-button-" + b}
+							className="controller-button"
 							icon={btn.icon}
 							onClick={() => {
-								if (btn.className === "controller-button") {
+								if (btn.dir) {
 									setDir(btn.dir);
 								} else {
 									if (end) {
